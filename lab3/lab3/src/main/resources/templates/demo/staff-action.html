@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Bài 6 - Nâng cao</title>
+    <style>
+        .high-salary { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+<h2 style="text-align: center;">QUẢN LÝ NHÂN VIÊN (NÂNG CAO)</h2>
+<table border="1" style="width:100%; border-collapse: collapse;">
+    <thead>
+    <tr style="background-color: #2c3e50; color: white;">
+        <th>Chọn</th>
+        <th>STT</th>
+        <th>Họ và Tên</th>
+        <th>Lương</th>
+        <th>Tình trạng lương</th>
+        <th>Thao tác</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="staff, st : ${list}">
+        <td style="text-align: center;">
+            <input type="checkbox" th:value="${staff.id}">
+        </td>
+
+        <td th:text="${st.count}"></td>
+
+        <td th:text="${#strings.capitalizeWords(staff.fullname)}"></td>
+
+        <td th:text="${#numbers.formatDecimal(staff.salary, 0, 'COMMA', 2, 'POINT')}"></td>
+
+        <td>
+            <span th:if="${staff.salary > 15000}" class="high-salary">Lương cao</span>
+            <span th:unless="${staff.salary > 15000}">Bình thường</span>
+        </td>
+
+        <td>
+            <a th:href="@{|/staff/detail?id=${staff.id}|}">Xem chi tiết</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

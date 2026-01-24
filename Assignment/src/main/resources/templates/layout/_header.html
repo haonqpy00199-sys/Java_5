@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<header th:fragment="header">
+    <style>
+        /* 1. Hiệu ứng viền đặc trưng SkyShop khi di chuột */
+        .nav-sky-box {
+            border: 1px solid transparent;
+            padding: 5px 8px;
+            cursor: pointer;
+            transition: border 0.2s ease;
+        }
+        .nav-sky-box:hover {
+            border: 1px solid white;
+            border-radius: 2px;
+        }
+
+        /* 2. Cấu hình Dropdown & Thanh phân loại */
+        .dropdown-menu { min-width: 240px; font-size: 14px; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .hover-cyan:hover {
+            background-color: #e0f7ff !important;
+            border-color: #00a8e8 !important;
+            color: #00a8e8 !important;
+        }
+    </style>
+
+    <nav class="navbar navbar-expand-lg py-1 shadow-sm" style="background-color: #0f172a;">
+        <div class="container-fluid px-3">
+            <a class="navbar-brand d-flex align-items-center nav-sky-box ms-2" th:href="@{/home/index}">
+                <i class="fa-solid fa-cloud-bolt text-info fs-3 me-2"></i>
+                <span class="text-white fw-bold fs-4">SkyShop</span>
+            </a>
+
+            <form class="d-flex flex-grow-1 mx-3" th:action="@{/product/search}" method="get">
+                <div class="input-group">
+                    <button class="btn btn-light dropdown-toggle border-0" type="button"
+                            style="background-color: #f3f3f3; color: #555; font-size: 13px;">All</button>
+                    <input type="text" name="keywords" class="form-control border-0 shadow-none"
+                           placeholder="Search SkyShop" th:value="${keywords}">
+                    <button class="btn" type="submit" style="background-color: #00a8e8; color: white;">
+                        <i class="fa-solid fa-magnifying-glass fs-5"></i>
+                    </button>
+                </div>
+            </form>
+
+            <div class="d-flex text-white align-items-center">
+                <div class="nav-item dropdown nav-sky-box mx-1">
+                    <a class="nav-link dropdown-toggle text-white p-0 border-0 d-flex align-items-center shadow-none"
+                       href="#" id="accountDropdown" data-bs-toggle="dropdown">
+                        <div class="lh-sm text-start">
+                            <small style="font-size: 11px;" class="fw-normal">
+                                Hello, <span th:text="${session.user != null ? session.user.fullname : 'sign in'}">sign in</span>
+                            </small><br>
+                            <span style="font-weight: bold; font-size: 14px;">Account & Lists</span>
+                        </div>
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end shadow mt-2 py-3 border-0">
+                        <li th:if="${session.user == null}" class="px-3 pb-3 text-center border-bottom">
+                            <a th:href="@{/auth/login}" class="btn btn-info btn-sm w-100 fw-bold rounded-pill text-white"
+                               style="background-color: #00a8e8; border: none;">Sign in</a>
+                        </li>
+
+                        <li class="px-3 pt-2"><h6 class="dropdown-header text-dark fw-bold p-0 mb-2">Your Account</h6></li>
+                        <li><a class="dropdown-item py-1 small" th:href="@{/order/list}">Your Orders</a></li>
+                        <li><a class="dropdown-item py-1 small" th:href="@{/account/profile}">Your Account</a></li>
+
+                        <li th:if="${session.user != null and session.user.admin}">
+                            <hr class="dropdown-divider">
+                            <h6 class="dropdown-header text-dark fw-bold px-3">Administration</h6>
+
+                            <a class="dropdown-item py-1 small fw-bold" th:href="@{/admin/home/index}">
+                                <i class="fa-solid fa-gauge-high me-2 text-info"></i>Admin Dashboard
+                            </a>
+
+                            <a class="dropdown-item py-1 small" th:href="@{/admin/category/index}">
+                                <i class="fa-solid fa-tags me-2 text-info"></i>Manage Categories
+                            </a>
+
+                            <a class="dropdown-item py-1 small" th:href="@{/admin/product/index}">
+                                <i class="fa-solid fa-box me-2 text-info"></i>Manage Products
+                            </a>
+
+                            <a class="dropdown-item py-1 small" th:href="@{/admin/order/index}">
+                                <i class="fa-solid fa-file-invoice me-2 text-info"></i>Manage Orders
+                            </a>
+
+                            <a class="dropdown-item py-1 small fw-bold text-success" th:href="@{/admin/report/index}">
+                                <i class="fa-solid fa-chart-pie me-2"></i>Sales Report
+                            </a>
+
+                            <a class="dropdown-item py-1 small text-primary fw-bold" th:href="@{/admin/account/index}">
+                                <i class="fa-solid fa-users-gear me-2"></i>Manage Accounts
+                            </a>
+                        </li>
+
+                        <li th:if="${session.user != null}">
+                            <hr class="dropdown-divider">
+                            <a class="dropdown-item text-danger fw-bold py-1 small" th:href="@{/auth/logout}">Sign Out</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <a th:href="@{/cart/view}" class="text-white text-decoration-none nav-sky-box position-relative d-flex align-items-end ms-2 pe-2">
+                    <div class="position-relative me-1">
+                        <i class="fa-solid fa-cart-shopping" style="font-size: 30px;"></i>
+                        <span class="badge rounded-pill bg-info position-absolute top-0 start-100 translate-middle"
+                              th:text="${cart != null ? cart.count : 0}">0</span>
+                    </div>
+                    <span class="fw-bold" style="font-size: 14px;">Cart</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid bg-white border-bottom shadow-sm py-2">
+        <div class="d-flex align-items-center overflow-auto no-scrollbar px-3">
+            <a th:href="@{/home/index}" class="btn btn-sm btn-outline-secondary rounded-pill me-2 fw-bold text-nowrap px-3">
+                All Deals
+            </a>
+            <a href="#" class="btn btn-sm btn-outline-danger rounded-pill me-2 fw-bold text-nowrap px-3">
+                <i class="fa-solid fa-bolt me-1"></i> Lightning deals
+            </a>
+
+            <th:block th:each="c : ${categories}">
+                <a th:href="@{|/product/search?category=${c.id}|}"
+                   class="btn btn-sm btn-light border rounded-pill me-2 text-nowrap px-3 fw-medium hover-cyan">
+                    <span th:text="${c.name}">Category Name</span>
+                </a>
+            </th:block>
+        </div>
+    </div>
+</header>
+</html>

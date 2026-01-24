@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>_form.html</title>
+</head>
+<body>
+<form th:object="${item}" method="post" class="row g-3 justify-content-center">
+    <div class="col-md-4">
+        <input th:field="*{id}" class="form-control" placeholder="Category Id?"
+               th:readonly="${item.id != null}"/>
+    </div>
+    <div class="col-md-5">
+        <input th:field="*{name}" class="form-control" placeholder="Category Name?"/>
+    </div>
+    <div class="col-12 text-center mt-3">
+        <button th:formaction="@{/category/create}" class="btn btn-success px-4">Create</button>
+        <button th:formaction="@{/category/update}" class="btn btn-primary px-4">Update</button>
+        <a th:href="@{|/category/delete/${item.id}|}" class="btn btn-danger px-4"
+           th:if="${item.id != null}">Delete</a>
+        <a href="/category/index" class="btn btn-outline-secondary px-4">Reset</a>
+    </div>
+</form>
+</body>
+</html>

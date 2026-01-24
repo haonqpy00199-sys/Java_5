@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giỏ hàng của bạn</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .cart-img { width: 60px; height: 60px; object-fit: contain; border-radius: 5px; }
+        .table th { background-color: #f8f9fa; }
+    </style>
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <div class="card shadow border-0 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold m-0">Giỏ hàng của bạn</h2>
+            <span class="badge bg-primary" th:text="${cart.count} + ' sản phẩm'">0</span>
+        </div>
+
+        <table class="table align-middle text-center">
+            <thead>
+            <tr>
+                <th>Sản phẩm</th> <th>Tên</th>
+                <th>Đơn giá</th>
+                <th>Số lượng</th>
+                <th>Thành tiền</th>
+                <th>Thao tác</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${cart.items}">
+                <form th:action="@{/cart/update/{id}(id=${item.id})}" method="post">
+                    <td>
+                        <img th:src="@{|/images/${item.id}.jpg|}"
+                             class="cart-img border"
+                             onerror="this.src='https://via.placeholder.com/60'">
+                    </td>
+                    <td class="fw-bold" th:text="${item.name}"></td>
+                    <td th:text="${item.price} + ' $'"></td>
+                    <td>
+                        <input name="qty" th:value="${item.qty}" onblur="this.form.submit()"
+                               type="number" min="1" class="form-control mx-auto" style="width: 70px;">
+                    </td>
+                    <td class="text-primary fw-bold" th:text="${item.price * item.qty} + ' $'"></td>
+                    <td>
+                        <a th:href="@{/cart/remove/{id}(id=${item.id})}" class="btn btn-outline-danger btn-sm">Xóa</a>
+                    </td>
+                </form>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="row mt-4 align-items-center">
+            <div class="col-md-6">
+                <h4 class="m-0 text-danger fw-bold">Tổng thanh toán: <span th:text="${cart.amount}"></span> $</h4>
+            </div>
+            <div class="col-md-6 text-end">
+                <a th:href="@{/cart/clear}" class="btn btn-outline-warning">Xóa sạch giỏ</a>
+                <a th:href="@{/item/index}" class="btn btn-secondary">Tiếp tục mua sắm</a>
+                <button class="btn btn-success px-4">Thanh toán ngay</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

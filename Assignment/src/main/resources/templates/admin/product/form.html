@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SkyShop - Product Edition</title>
+</head>
+<body>
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-header bg-white py-3 border-bottom-0">
+                <h5 class="mb-0 fw-bold text-dark">
+                    <i class="fa-solid fa-pen-nib me-2 text-info"></i>
+                    <span th:text="${product.id == null ? 'Create New Product' : 'Edit Product (ID: ' + product.id + ')'}"></span>
+                </h5>
+            </div>
+
+            <div class="card-body p-4">
+                <form th:action="@{/admin/product/save}" method="post" th:object="${product}" enctype="multipart/form-data">
+
+                    <input type="hidden" th:field="*{id}">
+                    <input type="hidden" th:field="*{image}">
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label class="form-label fw-bold small text-muted">Product Name</label>
+                            <input type="text" th:field="*{name}" class="form-control shadow-none border-secondary-subtle"
+                                   placeholder="Enter product name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Category</label>
+                            <select th:field="*{category.id}" class="form-select shadow-none border-secondary-subtle">
+                                <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}"></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4 align-items-center">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label class="form-label fw-bold small text-muted">Price (₫)</label>
+                            <input type="number" step="1000" th:field="*{price}" class="form-control shadow-none border-secondary-subtle"
+                                   placeholder="0.00" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small d-block mb-2 text-muted">Inventory Status</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input shadow-none" type="checkbox" th:field="*{available}" id="availableSwitch">
+                                <label class="form-check-label small" for="availableSwitch">Available for sale</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted">Product Image</label>
+
+                        <div th:if="${product.image != null}" class="mb-3 p-2 border rounded-3 bg-light d-inline-block shadow-sm">
+                            <img th:src="@{|/images/${product.image}|}" height="120" class="rounded" alt="Current image">
+                            <small class="d-block text-center text-muted mt-1 fw-bold">Current Preview</small>
+                        </div>
+
+                        <input type="file" name="imageFile" class="form-control shadow-none border-secondary-subtle" accept="image/*">
+                        <div class="form-text small text-info"><i class="fa-solid fa-circle-info me-1"></i>Leave empty to keep current image.</div>
+                    </div>
+
+                    <div class="d-flex justify-content-end border-top pt-4">
+                        <a th:href="@{/admin/product/index}" class="btn btn-light border rounded-pill me-3 px-4 fw-bold">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-info text-white rounded-pill px-5 fw-bold shadow-sm" style="background-color: #00a8e8;">
+                            <i class="fa-solid fa-cloud-arrow-up me-2"></i>Save Product
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

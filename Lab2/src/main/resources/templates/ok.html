@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>OK</title>
+
+    <!-- CSS -->
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #dbeafe, #f8fafc);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background: white;
+            width: 500px;
+            padding: 30px;
+            border-radius: 14px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        h2 {
+            color: #1e3a8a;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            background: #2563eb;
+            color: white;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 15px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            font-size: 18px;
+            color: #1e293b;
+        }
+
+        .note {
+            margin-top: 15px;
+            font-size: 13px;
+            color: #64748b;
+        }
+    </style>
+
+    <!-- JavaScript -->
+    <script>
+        function showInfo(type) {
+            let msg = "";
+            switch (type) {
+                case 1:
+                    msg = "OK 1 → Gửi POST /ctrl/ok";
+                    break;
+                case 2:
+                    msg = "OK 2 → Gửi GET /ctrl/ok";
+                    break;
+                case 3:
+                    msg = "OK 3 → Gửi POST /ctrl/ok?x";
+                    break;
+            }
+            alert(msg);
+        }
+    </script>
+</head>
+
+<body>
+
+<div class="card">
+    <h2>DEMO FORM METHOD</h2>
+
+    <form action="/ctrl/ok" method="post">
+        <button onclick="showInfo(1)">OK 1</button>
+        <button formmethod="get" onclick="showInfo(2)">OK 2</button>
+        <button formaction="/ctrl/ok?x" onclick="showInfo(3)">OK 3</button>
+    </form>
+
+    <div class="result">
+        Method nhận được:
+        <b th:text="${method}">---</b>
+    </div>
+
+    <div class="note">
+        OK 1: POST <br>
+        OK 2: GET <br>
+        OK 3: POST + QueryParam
+    </div>
+</div>
+
+</body>
+</html>

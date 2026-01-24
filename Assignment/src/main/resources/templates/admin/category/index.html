@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-pen-to-square me-2 text-info"></i>Category Details</h5>
+            </div>
+            <div class="card-body p-4">
+                <form th:action="@{/admin/category/save}" th:object="${item}" method="post">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">Category ID</label>
+                        <input th:field="*{id}" class="form-control shadow-none border-secondary-subtle"
+                               placeholder="e.g., ELEC" th:readonly="${not #strings.isEmpty(item.id)}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted">Category Name</label>
+                        <input th:field="*{name}" class="form-control shadow-none border-secondary-subtle"
+                               placeholder="e.g., Electronics" required>
+                    </div>
+                    <div class="d-grid gap-2 d-md-block">
+                        <button class="btn btn-info text-white rounded-pill px-4 fw-bold shadow-sm" style="background-color: #00a8e8;">
+                            <i class="fa-solid fa-floppy-disk me-1"></i> Save
+                            </a>
+                            <a th:href="@{/admin/category/index}" class="btn btn-light border rounded-pill px-4 fw-bold">Reset</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-list-ul me-2 text-info"></i>Category List</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-muted">
+                        <tr>
+                            <th class="ps-4 small fw-bold">ID</th>
+                            <th class="small fw-bold">NAME</th>
+                            <th class="text-end pe-4 small fw-bold">ACTIONS</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="c : ${items}">
+                            <td class="ps-4 fw-bold text-muted" th:text="${c.id}"></td>
+                            <td class="fw-bold" th:text="${c.name}"></td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group shadow-sm rounded-pill overflow-hidden border">
+                                    <a th:href="@{|/admin/category/edit/${c.id}|}" class="btn btn-white btn-sm px-3 text-primary border-end">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+                                    <a th:href="@{|/admin/category/delete/${c.id}|}"
+                                       onclick="return confirm('Are you sure you want to delete?');"
+                                       class="btn btn-white btn-sm px-3 text-danger">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

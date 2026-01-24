@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Bài 4 - Trạng thái vòng lặp</title>
+</head>
+<body>
+<h2 style="text-align: center;">THÔNG TIN TRẠNG THÁI VÒNG LẶP</h2>
+<table border="1" style="width:100%; border-collapse: collapse;">
+    <thead>
+    <tr>
+        <th rowspan="2">HỌ VÀ TÊN</th>
+        <th colspan="6">CÁC THUỘC TÍNH TRẠNG THÁI</th>
+    </tr>
+    <tr style="background-color: #eee;">
+        <th>Index</th>
+        <th>Count</th>
+        <th>First</th>
+        <th>Last</th>
+        <th>Odd</th>
+        <th>Even</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="staff, st : ${list}"
+        th:style="@{|background-color:${st.odd ? 'pink' : 'cyan'}|}">
+
+        <td th:text="${#strings.capitalizeWords(staff.fullname)}"></td>
+        <td th:text="${st.index}"></td> <td th:text="${st.count}"></td> <td th:text="${st.first}"></td> <td th:text="${st.last}"></td>  <td th:text="${st.odd}"></td>   <td th:text="${st.even}"></td>  </tr>
+    </tbody>
+</table>
+</body>
+</html>

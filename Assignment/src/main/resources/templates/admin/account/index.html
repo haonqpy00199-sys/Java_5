@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Index Account</title>
+</head>
+<body>
+<div class="card shadow-sm border-0 rounded-3">
+    <div class="card-header bg-white py-3 border-bottom-0">
+        <h5 class="mb-0 fw-bold text-dark">
+            <i class="fa-solid fa-users-gear me-2 text-info"></i>User Account Management
+        </h5>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-muted">
+                <tr>
+                    <th class="ps-4 small fw-bold">USERNAME</th>
+                    <th class="small fw-bold">FULL NAME</th>
+                    <th class="small fw-bold">EMAIL</th>
+                    <th class="text-center small fw-bold">ROLE</th>
+                    <th class="text-center small fw-bold">STATUS</th>
+                    <th class="text-end pe-4 small fw-bold">ACTIONS</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="a : ${accounts}">
+                    <td class="ps-4 fw-bold" th:text="${a.username}"></td>
+                    <td th:text="${a.fullname}"></td>
+                    <td th:text="${a.email}"></td>
+                    <td class="text-center">
+                        <a th:href="@{|/admin/account/role/${a.username}|}" class="text-decoration-none">
+                            <span th:if="${a.admin}" class="badge bg-primary-subtle text-primary px-3 rounded-pill">Admin</span>
+                            <span th:unless="${a.admin}" class="badge bg-secondary-subtle text-secondary px-3 rounded-pill">User</span>
+                        </a>
+                    </td>
+                    <td class="text-center">
+                        <a th:href="@{|/admin/account/status/${a.username}|}" class="text-decoration-none">
+                            <span th:if="${a.activated}" class="text-success"><i class="fa-solid fa-toggle-on fs-4"></i></span>
+                            <span th:unless="${a.activated}" class="text-danger"><i class="fa-solid fa-toggle-off fs-4"></i></span>
+                        </a>
+                    </td>
+                    <td class="text-end pe-4">
+                        <button class="btn btn-sm btn-outline-info rounded-circle me-1"><i class="fa-solid fa-user-pen"></i></button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Bài 5 - Đồng bộ điều khiển</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 30px; background-color: #f4f7f6; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .control-group { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+        h3 { color: #2c3e50; font-size: 1.2rem; margin-bottom: 15px; border-left: 5px solid #3498db; padding-left: 10px; }
+        select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; outline: none; transition: border 0.3s; }
+        select:focus { border-color: #3498db; }
+        .radio-item { display: block; padding: 10px; margin: 5px 0; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
+        .radio-item:hover { background-color: #ebf5fb; }
+        input[type="radio"] { margin-right: 12px; transform: scale(1.2); cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="control-group">
+        <h3>Fill to SelectBox</h3>
+        <select id="staffSelect" onchange="syncToRadio(this.value)">
+            <option value="">-- Chọn nhân viên --</option>
+            <th:block th:each="staff : ${list}">
+                <option th:value="${staff.id}" th:text="${staff.fullname}"></option>
+            </th:block>
+        </select>
+    </div>
+
+    <div class="control-group">
+        <h3>Create Radio Button Group</h3>
+        <th:block th:each="staff : ${list}">
+            <label class="radio-item">
+                <input type="radio" name="staffRadio"
+                       th:value="${staff.id}"
+                       onclick="syncToSelect(this.value)">
+                <span th:text="${staff.fullname}"></span>
+            </label>
+        </th:block>
+    </div>
+</div>
+
+<script>
+    // Hàm: Chọn ở trên (SelectBox) -> Tự động chọn ở dưới (Radio)
+    function syncToRadio(value) {
+        if(!value) return;
+        const radios = document.getElementsByName('staffRadio');
+        radios.forEach(radio => {
+            if (radio.value === value) {
+                radio.checked = true;
+            }
+        });
+    }
+
+    // Hàm: Chọn ở dưới (Radio) -> Tự động chọn ở trên (SelectBox)
+    function syncToSelect(value) {
+        const select = document.getElementById('staffSelect');
+        select.value = value;
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Form</title>
+
+    <!-- CSS -->
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e0f2fe, #f8fafc);
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        h2, h3 {
+            color: #1e3a8a;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        hr {
+            margin: 25px 0;
+            border: none;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        ul li {
+            padding: 6px 0;
+        }
+
+        .box {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .warning {
+            color: #dc2626;
+            font-style: italic;
+        }
+
+        .item-list li {
+            border-bottom: 1px dashed #cbd5e1;
+        }
+    </style>
+
+    <!-- JavaScript -->
+    <script>
+        function validateForm() {
+            const name = document.getElementById("name").value.trim();
+            const price = document.getElementById("price").value.trim();
+
+            if (name === "") {
+                alert("Vui lòng nhập tên sản phẩm!");
+                return false;
+            }
+
+            if (price === "" || price <= 0) {
+                alert("Giá sản phẩm phải lớn hơn 0!");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>BÀI 3 + BÀI 4: FORM NHẬP SẢN PHẨM</h2>
+
+    <!-- FORM -->
+    <form th:action="@{/product/save}" method="post" onsubmit="return validateForm()">
+        <label>Tên sản phẩm</label>
+        <input type="text" id="name" name="name" placeholder="Nhập tên sản phẩm">
+
+        <br><br>
+
+        <label>Giá</label>
+        <input type="number" step="0.1" id="price" name="price" placeholder="Nhập giá">
+
+        <br><br>
+
+        <button type="submit">Save</button>
+    </form>
+
+    <hr>
+
+    <h3>BÀI 4: DỮ LIỆU MẪU</h3>
+    <div class="box">
+        <ul>
+            <li>Tên: <b th:text="${p1.name}"></b></li>
+            <li>Giá: <b th:text="${p1.price}"></b></li>
+        </ul>
+    </div>
+
+    <hr>
+
+    <h3>BÀI 3 + 4: DỮ LIỆU SAU KHI SUBMIT</h3>
+
+    <div class="box" th:if="${p2 != null}">
+        <ul>
+            <li>Tên: <b th:text="${p2.name}"></b></li>
+            <li>Giá: <b th:text="${p2.price}"></b></li>
+        </ul>
+    </div>
+
+    <div class="warning" th:if="${p2 == null}">
+        Chưa có dữ liệu submit
+    </div>
+
+    <hr>
+
+    <h3>BÀI 4: DANH SÁCH SẢN PHẨM</h3>
+    <ul class="item-list">
+        <li th:each="item : ${items}">
+            <b th:text="${item.name}"></b> –
+            <span th:text="${item.price}"></span>
+        </li>
+    </ul>
+
+</div>
+
+</body>
+</html>

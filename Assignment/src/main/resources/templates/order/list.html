@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>List</title>
+</head>
+<body>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-normal">Your Orders</h2>
+        <div class="input-group w-25">
+            <input type="text" class="form-control form-control-sm" placeholder="Search all orders">
+            <button class="btn btn-dark btn-sm">Search</button>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(orders)}" class="text-center py-5 bg-white shadow-sm rounded">
+        <p class="text-muted">You haven't placed any orders yet.</p>
+        <a th:href="@{/home/index}" class="btn btn-warning rounded-pill fw-bold">Start Shopping</a>
+    </div>
+
+    <div th:each="o : ${orders}" class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-light d-flex justify-content-between py-3">
+            <div class="row w-100">
+                <div class="col-md-3">
+                    <small class="text-muted text-uppercase d-block">Order Placed</small>
+                    <span th:text="${#dates.format(o.createDate, 'dd MMMM yyyy')}"></span>
+                </div>
+                <div class="col-md-2">
+                    <small class="text-muted text-uppercase d-block">Total</small>
+                    <span class="fw-bold" th:text="${#numbers.formatCurrency(#aggregates.sum(o.orderDetails.![price * quantity]))}"></span>
+                </div>
+                <div class="col-md-4">
+                    <small class="text-muted text-uppercase d-block">Ship To</small>
+                    <span class="text-primary dropdown-toggle" th:text="${session.user.fullname}"></span>
+                </div>
+                <div class="col-md-3 text-end">
+                    <small class="text-muted text-uppercase d-block">Order # <span th:text="${o.id}"></span></small>
+                    <a th:href="@{|/order/detail/${o.id}|}" class="small text-decoration-none">View order details</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-9">
+                    <h6 class="fw-bold text-success mb-2">Delivered / Processing</h6>
+                    <div class="d-flex overflow-auto pb-2">
+                        <div th:each="d : ${o.orderDetails}" class="me-3 text-center" style="min-width: 80px;">
+                            <img th:src="@{|/images/${d.product.image}|}" width="60" class="rounded border">
+                            <div class="small text-muted mt-1">x<span th:text="${d.quantity}"></span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 text-end">
+                    <a th:href="@{/home/index}" class="btn btn-warning w-100 rounded-pill fw-bold btn-sm mb-2 shadow-sm">Buy it again</a>
+                    <button class="btn btn-light w-100 border btn-sm shadow-sm">Track package</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

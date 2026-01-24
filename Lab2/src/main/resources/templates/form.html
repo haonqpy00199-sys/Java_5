@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Form</title>
+
+    <!-- CSS -->
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #e0f2fe, #f8fafc);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 420px;
+            background: white;
+            padding: 30px;
+            border-radius: 14px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        h2 {
+            text-align: center;
+            color: #1e3a8a;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: 600;
+            color: #334155;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 20px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        ul li {
+            padding: 6px 0;
+            font-size: 16px;
+        }
+
+        .note {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 13px;
+            color: #64748b;
+        }
+    </style>
+
+    <!-- JavaScript -->
+    <script>
+        function validateForm() {
+            const y = document.getElementById("y").value.trim();
+
+            if (y === "") {
+                alert("Vui lòng nhập giá trị y!");
+                return false;
+            }
+
+            if (isNaN(y)) {
+                alert("Giá trị y phải là số!");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>FORM PARAM DEMO</h2>
+
+    <form action="/param/save/2021" method="post" onsubmit="return validateForm()">
+        <label>Giá trị y</label>
+        <input id="y" name="y" value="2031">
+
+        <button>Save</button>
+    </form>
+
+    <ul>
+        <li><b>x:</b> <span th:text="${x}"></span></li>
+        <li><b>y:</b> <span th:text="${y}"></span></li>
+    </ul>
+
+    <div class="note">
+        x lấy từ PathVariable<br>
+        y lấy từ RequestParam
+    </div>
+</div>
+
+</body>
+</html>

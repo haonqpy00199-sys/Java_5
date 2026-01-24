@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div class="container mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-info text-white py-3">
+            <h4 class="mb-0"><i class="fa-solid fa-file-invoice me-2"></i>Order Details #<span th:text="${order.id}"></span></h4>
+        </div>
+        <div class="card-body p-4">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <p><strong>Customer:</strong> <span th:text="${order.account.fullname}"></span></p>
+                    <p><strong>Order Date:</strong> <span th:text="${#dates.format(order.createDate, 'dd-MM-yyyy HH:mm')}"></span></p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p><strong>Shipping Address:</strong> <span th:text="${order.address}"></span></p>
+                </div>
+            </div>
+
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                <tr>
+                    <th>Product</th>
+                    <th class="text-center">Price</th>
+                    <th class="text-center">Quantity</th>
+                    <th class="text-end">Amount</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="detail : ${order.orderDetails}">
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img th:src="@{|/images/${detail.product.image}|}" width="50" class="me-3 rounded">
+                            <span th:text="${detail.product.name}" class="fw-bold"></span>
+                        </div>
+                    </td>
+                    <td class="text-center" th:text="${#numbers.formatCurrency(detail.price)}"></td>
+                    <td class="text-center" th:text="${detail.quantity}"></td>
+                    <td class="text-end fw-bold text-info" th:text="${#numbers.formatCurrency(detail.price * detail.quantity)}"></td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="3" class="text-end fw-bold fs-5">Total Order Amount:</td>
+                    <td class="text-end fw-bold fs-5 text-danger"
+                        th:text="${#numbers.formatCurrency(#aggregates.sum(order.orderDetails.![price * quantity]))}"></td>
+                </tr>
+                </tfoot>
+            </table>
+
+            <div class="mt-4">
+                <a th:href="@{/order/list}" class="btn btn-outline-secondary rounded-pill">
+                    <i class="fa-solid fa-arrow-left me-2"></i>Back to Orders
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

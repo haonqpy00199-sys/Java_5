@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meưta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="row bg-white p-4 shadow-sm rounded">
+    <div class="col-md-5 text-center border-end">
+        <img th:src="@{|/images/${item.image}|}" class="img-fluid" style="max-height: 400px;">
+    </div>
+
+    <div class="col-md-7 ps-4">
+        <h2 class="fw-normal" th:text="${item.name}"></h2>
+        <div class="text-info small mb-2">Visit the Store</div>
+        <div class="text-warning mb-3">
+            4.5 <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>...
+        </div>
+        <hr>
+        <div class="text-danger h3" th:text="${#numbers.formatCurrency(item.price)}"></div>
+        <p class="mt-3"><b>About this item:</b> High quality product from Amazon Selection.</p>
+
+        <div class="card bg-light mt-4" style="max-width: 300px;">
+            <div class="card-body">
+                <div class="text-success fw-bold">In Stock</div>
+                <a th:href="@{|/cart/add/${item.id}|}" class="btn btn-warning w-100 rounded-pill fw-bold mt-3">Add to Cart</a>
+                <button class="btn btn-orange w-100 rounded-pill fw-bold mt-2 text-white" style="background-color: #ffa41c;">Buy Now</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

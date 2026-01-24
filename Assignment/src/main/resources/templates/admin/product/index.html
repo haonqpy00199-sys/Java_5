@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SkyShop - Product Management</title>
+</head>
+<body>
+<div class="card shadow-sm border-0 rounded-3">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom-0">
+        <h5 class="mb-0 fw-bold text-dark">
+            <i class="fa-solid fa-boxes-stacked me-2 text-info"></i>Product Inventory
+        </h5>
+        <a th:href="@{/admin/product/create}" class="btn btn-info text-white rounded-pill fw-bold shadow-sm px-4"
+           style="background-color: #00a8e8; border: none;">
+            <i class="fa-solid fa-plus-circle me-1"></i> Add New Product
+        </a>
+    </div>
+
+    <div class="card-body p-0">
+        <div th:if="${param.message}" class="alert alert-success m-3 rounded-pill px-4 small border-0 shadow-sm">
+            <i class="fa-solid fa-circle-check me-2"></i>
+            <span th:text="${param.message}"></span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-muted">
+                <tr>
+                    <th class="ps-4 fw-bold small uppercase">ID</th>
+                    <th class="fw-bold small uppercase">Preview</th>
+                    <th class="fw-bold small uppercase">Product Info</th>
+                    <th class="fw-bold small uppercase">Category</th>
+                    <th class="fw-bold small uppercase">Price</th>
+                    <th class="text-center fw-bold small uppercase">Status</th>
+                    <th class="text-end pe-4 fw-bold small uppercase">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${items}">
+                    <td class="ps-4 fw-bold text-muted" th:text="${p.id}"></td>
+                    <td>
+                        <div class="p-1 border rounded bg-light d-inline-block shadow-sm">
+                            <img th:src="@{|/images/${p.image}|}" alt="Product Image"
+                                 class="rounded" style="width: 50px; height: 50px; object-fit: contain;">
+                        </div>
+                    </td>
+                    <td>
+                        <span class="fw-bold d-block text-dark text-truncate" style="max-width: 250px;" th:text="${p.name}"></span>
+                        <small class="text-muted" style="font-size: 11px;">
+                            <i class="fa-regular fa-calendar-plus me-1"></i>
+                            Added: <span th:text="${#dates.format(p.createDate, 'dd/MM/yyyy')}"></span>
+                        </small>
+                    </td>
+                    <td>
+                        <span class="badge bg-light text-secondary border fw-normal"
+                              th:text="${p.category != null ? p.category.name : 'Uncategorized'}"></span>
+                    </td>
+                    <td class="fw-bold text-info">
+                        <span th:text="${#numbers.formatCurrency(p.price)}"></span>
+                    </td>
+                    <td class="text-center">
+                        <span th:if="${p.available}" class="badge rounded-pill bg-success-subtle text-success px-3">
+                            <i class="fa-solid fa-check-double me-1"></i>Active
+                        </span>
+                        <span th:unless="${p.available}" class="badge rounded-pill bg-danger-subtle text-danger px-3">
+                            <i class="fa-solid fa-circle-xmark me-1"></i>Hidden
+                        </span>
+                    </td>
+                    <td class="text-end pe-4">
+                        <div class="btn-group shadow-sm rounded-pill overflow-hidden border">
+                            <a th:href="@{|/admin/product/edit/${p.id}|}"
+                               class="btn btn-white btn-sm px-3 text-primary border-end" title="Edit">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                            <a th:href="@{|/admin/product/delete/${p.id}|}"
+                               onclick="return confirm('Are you sure you want to permanently delete this product?');"
+                               class="btn btn-white btn-sm px-3 text-danger" title="Delete">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${items.isEmpty()}">
+                    <td colspan="7" class="text-center py-5 text-muted">
+                        <i class="fa-solid fa-inbox fs-1 d-block mb-3 opacity-25"></i>
+                        No products found in inventory.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card-footer bg-white border-top-0 py-3">
+        <small class="text-muted">
+            Showing <strong th:text="${items.size()}">0</strong> products in SkyShop catalog.
+        </small>
+    </div>
+</div>
+</body>
+</html>

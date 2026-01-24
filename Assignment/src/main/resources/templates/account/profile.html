@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-user-gear me-2 text-info"></i>Account Settings</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div th:if="${message != null}" class="alert alert-success py-2 small border-0 shadow-sm mb-4">
+                        <i class="fa-solid fa-check-circle me-2"></i> <span th:text="${message}"></span>
+                    </div>
+
+                    <form th:action="@{/account/update}" th:object="${account}" method="post" enctype="multipart/form-data">
+
+                        <input type="hidden" th:field="*{username}">
+                        <input type="hidden" th:field="*{photo}"> <input type="hidden" th:field="*{admin}">
+                        <input type="hidden" th:field="*{activated}">
+
+                        <div class="row mb-4">
+                            <div class="col-md-4 text-center border-end">
+                                <img th:src="@{|/images/${account.photo != null ? account.photo : 'default-user.png'}|}"
+                                     class="rounded-circle shadow-sm mb-3" width="120" height="120" style="object-fit: cover;">
+                                <div class="mb-3">
+                                    <label class="btn btn-light btn-sm border rounded-pill px-3">
+                                        Change Photo
+                                        <input type="file" name="photoFile" hidden accept="image/*">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-8 ps-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small text-muted">Full Name</label>
+                                    <input th:field="*{fullname}" class="form-control shadow-none border-secondary-subtle" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small text-muted">Email Address</label>
+                                    <input th:field="*{email}" type="email" class="form-control shadow-none border-secondary-subtle" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small text-muted">Password</label>
+                                    <div class="input-group">
+                                        <input th:field="*{password}" type="password" class="form-control shadow-none border-secondary-subtle" required>
+                                        <span class="input-group-text bg-white border-secondary-subtle"><i class="fa-solid fa-lock text-muted"></i></span>
+                                    </div>
+                                    <div class="form-text small">Ensure your password is strong to protect your account.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end border-top pt-4">
+                            <button type="submit" class="btn btn-info text-white rounded-pill px-5 fw-bold shadow-sm" style="background-color: #00a8e8;">
+                                Update Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
