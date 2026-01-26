@@ -2,31 +2,26 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>_table.html</title>
+    <title>Title</title>
 </head>
 <body>
-<div class="table-responsive">
-    <table class="table table-hover table-striped align-middle">
-        <thead class="table-dark">
-        <tr>
-            <th>Id</th>
-            <th>Category Name</th>
-            <th class="text-center">Action</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="category : ${items}">
-            <td class="fw-bold" th:text="${category.id}"></td>
-            <td th:text="${category.name}"></td>
-            <td class="text-center">
-                <a th:href="@{|/category/edit/${category.id}|}"
-                   class="btn btn-sm btn-outline-warning shadow-sm">
-                    Edit
-                </a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-</div>
+<table border="1" style="width: 100%; border-collapse: collapse;">
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="c : ${items}">
+        <td th:text="${c.id}"></td>
+        <td th:text="${c.name}"></td>
+        <td>
+            <a th:href="@{'/category/edit/' + ${c.id}}">Edit</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
 </body>
 </html>

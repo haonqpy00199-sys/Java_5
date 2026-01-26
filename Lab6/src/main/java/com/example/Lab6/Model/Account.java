@@ -1,10 +1,9 @@
-package com.example.Lab6.Model;
+package com.example.Lab6.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-
 import lombok.Data;
 
 import java.io.Serializable;
@@ -24,5 +23,4 @@ public class Account implements Serializable {
     boolean admin;
     @OneToMany(mappedBy = "account")
     List<Order> orders;
-
 }

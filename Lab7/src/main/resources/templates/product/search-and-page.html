@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Search & Page</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="container mt-4">
+<h2>SEARCH & PAGE</h2>
+
+<form action="/product/search-and-page" method="get" class="mb-3">
+    <div class="input-group w-50">
+        <input name="keywords" th:value="${session.keywords}" class="form-control" placeholder="Nhập tên sản phẩm...">
+        <button class="btn btn-primary">Search</button>
+    </div>
+</form>
+
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <th>Id</th> <th>Name</th> <th>Price</th> <th>Date</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="p : ${page.content}">
+        <td th:text="${p.id}"></td>
+        <td th:text="${p.name}"></td>
+        <td th:text="${p.price}"></td>
+        <td th:text="${p.date}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<nav>
+    <ul class="pagination">
+        <li class="page-item"><a class="page-link" th:href="@{|/product/search-and-page?p=0|}">First</a></li>
+        <li class="page-item"><a class="page-link" th:href="@{|/product/search-and-page?p=${page.number - 1}|}" th:if="${page.number > 0}">Previous</a></li>
+        <li class="page-item"><a class="page-link" th:href="@{|/product/search-and-page?p=${page.number + 1}|}" th:if="${page.number < page.totalPages - 1}">Next</a></li>
+        <li class="page-item"><a class="page-link" th:href="@{|/product/search-and-page?p=${page.totalPages - 1}|}">Last</a></li>
+    </ul>
+</nav>
+
+<ul class="list-group w-25">
+    <li class="list-group-item">Số thực thể hiện tại: [[${page.numberOfElements}]]</li>
+    <li class="list-group-item">Trang số: [[${page.number}]]</li>
+    <li class="list-group-item">Kích thước trang: [[${page.size}]]</li>
+    <li class="list-group-item">Tổng số thực thể: [[${page.totalElements}]]</li>
+    <li class="list-group-item">Tổng số trang: [[${page.totalPages}]]</li>
+</ul>
+</body>
+</html>

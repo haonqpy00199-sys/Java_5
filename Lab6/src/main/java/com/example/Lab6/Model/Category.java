@@ -1,4 +1,5 @@
-package com.example.Lab6.Model;
+package com.example.Lab6.model;
+
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -11,8 +12,8 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "Categories")
-public class Category implements Serializable {
+@Table(name ="Categories")
+public class Category  implements Serializable {
     @Id
     String id;
     String name;

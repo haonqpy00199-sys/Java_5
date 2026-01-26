@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Pagination</title>
+    <style>
+        /* CSS Tổng thể */
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 30px; background-color: #f4f7f6; color: #333; }
+        h3 { color: #2c3e50; text-transform: uppercase; letter-spacing: 1px; border-left: 5px solid #3498db; padding-left: 15px; }
+
+        /* Style cho Bảng dữ liệu */
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        th { background-color: #3498db; color: white; padding: 12px 15px; text-align: left; text-transform: uppercase; font-size: 14px; }
+        td { padding: 12px 15px; border-bottom: 1px solid #ddd; }
+        tr:hover { background-color: #f1f9ff; transition: 0.3s; }
+
+        /* Style cho các nút điều hướng (Pagination Buttons) */
+        .pagination-container { margin: 20px 0; display: flex; gap: 5px; }
+        .pagination-container a {
+            padding: 8px 16px; text-decoration: none; color: #3498db;
+            border: 1px solid #3498db; border-radius: 4px; font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .pagination-container a:hover { background-color: #3498db; color: white; }
+        .pagination-container a.disabled { color: #ccc; border-color: #eee; cursor: not-allowed; pointer-events: none; }
+
+        /* Style cho thông tin chi tiết */
+        .info-panel { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #e0e0e0; list-style: none; }
+        .info-panel li { margin-bottom: 8px; font-size: 14px; }
+        .info-panel li b { color: #e67e22; }
+    </style>
+</head>
+<body>
+<h3>PAGINATION</h3>
+<table border="1" style="width:100%">
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Date</th>
+    </tr>
+    <th:block th:each="item: ${page.content}">
+        <tr>
+            <td th:text="${item.id}"></td>
+            <td th:text="${item.name}"></td>
+            <td th:text="${item.price}"></td>
+            <td th:text="${item.createDate}"></td>
+        </tr>
+    </th:block>
+</table>
+<a th:href="@{|/product/page?p=0|}">First</a>
+<a th:href="@{|/product/page?p=${page.number - 1}|}">Previous</a>
+<a th:href="@{|/product/page?p=${page.number + 1}|}">Next</a>
+<a th:href="@{|/product/page?p=${page.totalPages - 1}|}">Last</a>
+<ul>
+    <li>Số thực thể hiện tại: [[${page.numberOfElements}]]</li>
+    <li>Trang số: [[${page.number}]]</li>
+    <li>Kích thước trang: [[${page.size}]]</li>
+    <li>Tổng số thực thể: [[${page.totalElements}]]</li>
+    <li>Tổng số trang: [[${page.totalPages}]]</li>
+</ul>
+
+<script>
+    // JS: Hiệu ứng khi nhấn vào các dòng trong bảng
+    document.querySelectorAll('tbody tr').forEach(row => {
+        row.addEventListener('click', () => {
+            alert('Bạn đã chọn sản phẩm: ' + row.cells[1].innerText);
+        });
+    });
+
+    // JS: Thông báo khi trang không còn dữ liệu để Next/Prev
+    const disabledLinks = document.querySelectorAll('.disabled');
+    disabledLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+        });
+    });
+</script>
+</body>
+</html>
