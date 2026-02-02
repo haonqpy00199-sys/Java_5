@@ -17,70 +17,79 @@ public class MailServiceImpl implements MailService {
     @Autowired
     JavaMailSender mailSender;
 
-    // Khởi tạo hàng đợi để tránh lỗi NullPointerException
+    // Hàng đợi chứa các mail chờ gửi
     private List<MailService.Mail> queue = new ArrayList<>();
 
-    @Override
-    public void send(MailService.Mail mail) { // Sửa lại kiểu dữ liệu Mail từ Interface
-        try {
-            // 1. Tạo MimeMessage [cite: 55]
-            MimeMessage message = mailSender.createMimeMessage();
+    // Danh sách lưu lịch sử các mail đã gửi thành công
+    private List<MailService.Mail> sentMails = new ArrayList<>();
 
-            // 2. Tạo đối tượng hỗ trợ soạn thảo [cite: 57, 58]
+    @Override
+    public void send(MailService.Mail mail) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
 
-            // 2.1. Ghi thông tin người gửi và người nhận [cite: 80, 81, 83]
             helper.setFrom(mail.getFrom());
-            helper.setReplyTo(mail.getFrom());
             helper.setTo(mail.getTo());
-
-            // 2.2. Xử lý CC và BCC [cite: 84, 86, 87, 89]
-            if (!this.isNullOrEmpty(mail.getCc())) {
-                helper.setCc(mail.getCc());
-            }
-            if (!this.isNullOrEmpty(mail.getBcc())) {
-                helper.setBcc(mail.getBcc());
-            }
-
-            // 2.3. Ghi tiêu đề và nội dung HTML [cite: 92, 93]
+            if (mail.getCc() != null && !mail.getCc().isEmpty()) helper.setCc(mail.getCc());
+            if (mail.getBcc() != null && !mail.getBcc().isEmpty()) helper.setBcc(mail.getBcc());
             helper.setSubject(mail.getSubject());
             helper.setText(mail.getBody(), true);
 
-            // 2.4. Đính kèm file từ danh sách cách nhau bởi dấu phẩy/chấm phẩy [cite: 95, 97, 99]
             String filenames = mail.getFilenames();
-            if (!this.isNullOrEmpty(filenames)) {
+            if (filenames != null && !filenames.isEmpty()) {
                 for (String filename : filenames.split("[,;]+")) {
                     File file = new File(filename.trim());
-                    if (file.exists()) { // Kiểm tra file có tồn tại không để tránh lỗi
+                    if (file.exists()) {
                         helper.addAttachment(file.getName(), file);
                     }
                 }
             }
 
-            // 3. Gửi Mail thực tế [cite: 64]
             mailSender.send(message);
+            sentMails.add(mail); // Lưu vào lịch sử
+            System.out.println("==> Đã gửi thành công đến: " + mail.getTo());
+
         } catch (Exception e) {
-            e.printStackTrace();
-            // Không nên throw RuntimeException ở đây nếu dùng Scheduled để tránh dừng luồng
+            System.err.println("Lỗi gửi mail: " + e.getMessage());
         }
     }
 
-    // Xếp mail vào hàng đợi (Bài 2) [cite: 132, 134]
     @Override
     public void push(MailService.Mail mail) {
         queue.add(mail);
     }
 
-    // Tự động gửi mail sau mỗi 500ms nếu hàng đợi có mail [cite: 135, 136, 138, 140]
-    @Scheduled(fixedDelay = 500)
+    @Override
+    public List<MailService.Mail> getSentMails() {
+        return sentMails;
+    }
+
+    /**
+     * TÍNH NĂNG TEST: Tự động tạo mail mỗi 10 giây và đẩy vào hàng đợi
+     * Chú ý: Thay địa chỉ email nhận để test
+     */
+    @Scheduled(fixedRate = 10000)
+    public void autoGenerateSpam() {
+        MailService.Mail spamMail = MailService.Mail.builder()
+                .to("email-nhan-test@gmail.com") // <== THAY EMAIL CỦA BẠN VÀO ĐÂY
+                .subject("Spam Test - " + System.currentTimeMillis())
+                .body("Đây là nội dung gửi tự động mỗi 10 giây để kiểm tra hệ thống.")
+                .build();
+
+        this.push(spamMail);
+        System.out.println(">>> Đã đẩy 1 mail spam mới vào hàng đợi.");
+    }
+
+    /**
+     * Quét hàng đợi để gửi mail.
+     * Để gửi đúng nhịp 10s/lần, ta lấy từng mail ra xử lý.
+     */
+    @Scheduled(fixedDelay = 10000)
     public void run() {
-        while (!queue.isEmpty()) {
+        if (!queue.isEmpty()) {
             MailService.Mail mail = queue.remove(0);
             this.send(mail);
         }
-    }
-
-    private boolean isNullOrEmpty(String text) {
-        return (text == null || text.trim().length() == 0);
     }
 }

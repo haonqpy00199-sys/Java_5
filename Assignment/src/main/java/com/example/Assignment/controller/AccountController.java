@@ -17,7 +17,7 @@ public class AccountController {
     AccountRepository accountRepo;
 
     @Autowired
-    UploadService uploadService; // Tiêm dịch vụ upload để xử lý ảnh
+    UploadService uploadService;
 
     @Autowired
     HttpSession session;
@@ -25,38 +25,57 @@ public class AccountController {
     // 1. Hiển thị trang hồ sơ cá nhân
     @GetMapping("/profile")
     public String profile(Model model) {
-        Account user = (Account) session.getAttribute("user");
-        if (user == null) {
+        Account userInSession = (Account) session.getAttribute("user");
+
+        // Kiểm tra Session
+        if (userInSession == null) {
             return "redirect:/auth/login";
         }
-        // Luôn lấy dữ liệu mới nhất từ DB để hiển thị chính xác ảnh và mật khẩu
-        model.addAttribute("account", accountRepo.findById(user.getUsername()).get());
+
+        // ĐÃ SỬA: Dùng orElse(null) thay vì .get() để tránh lỗi NoSuchElementException
+        Account account = accountRepo.findById(userInSession.getUsername()).orElse(null);
+
+        if (account == null) {
+            // Nếu Session còn nhưng Database đã bị xóa/thay đổi ID
+            session.removeAttribute("user");
+            return "redirect:/auth/login?message=Account not found!";
+        }
+
+        model.addAttribute("account", account);
         model.addAttribute("view", "account/profile");
         return "layout/index";
     }
 
-    // 2. Xử lý cập nhật thông tin, mật khẩu và hình ảnh
+    // 2. Xử lý cập nhật thông tin
     @PostMapping("/update")
     public String update(@ModelAttribute("account") Account account,
                          @RequestParam("photoFile") MultipartFile photoFile,
                          Model model) {
 
-        // Bước 1: Xử lý cập nhật ảnh đại diện mới nếu có
-        if (!photoFile.isEmpty()) {
-            String fileName = uploadService.save(photoFile); // Lưu file vào thư mục static/images
-            account.setPhoto(fileName);
-        } else {
-            // Nếu không chọn ảnh mới, giữ lại tên ảnh cũ từ database
-            Account currentAccount = accountRepo.findById(account.getUsername()).orElse(null);
-            if (currentAccount != null) {
-                account.setPhoto(currentAccount.getPhoto());
-            }
+        // Tìm tài khoản hiện tại trong DB để lấy lại các thông tin không có trên Form (như Admin, Activated)
+        Account currentAccount = accountRepo.findById(account.getUsername()).orElse(null);
+
+        if (currentAccount == null) {
+            return "redirect:/auth/login";
         }
 
-        // Bước 2: Lưu các thay đổi (bao gồm password và fullname) vào Database
+        // Bước 1: Xử lý cập nhật ảnh
+        if (!photoFile.isEmpty()) {
+            String fileName = uploadService.save(photoFile);
+            account.setPhoto(fileName);
+        } else {
+            // Giữ lại ảnh cũ nếu không upload ảnh mới
+            account.setPhoto(currentAccount.getPhoto());
+        }
+
+        // Bước 2: Bảo toàn các trường quan trọng không có trong Form Profile
+        account.setAdmin(currentAccount.getAdmin());
+        account.setActivated(currentAccount.getActivated());
+
+        // Bước 3: Lưu vào DB
         accountRepo.save(account);
 
-        // Bước 3: Cập nhật lại User trong Session để các trang khác (như Header) nhận thông tin mới
+        // Bước 4: Cập nhật lại Session để Header/UI đồng bộ
         session.setAttribute("user", account);
 
         model.addAttribute("message", "Your profile has been updated successfully!");

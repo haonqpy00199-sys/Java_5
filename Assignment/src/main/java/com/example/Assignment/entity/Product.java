@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Entity
@@ -35,6 +37,16 @@ public class Product implements Serializable {
     @Transient
     Integer qty = 1;
 
-    // Lưu ý: Nhờ có @Data của Lombok, bạn không cần viết thủ công
-    // getQty() và setQty() nữa. Nó sẽ tự động được tạo ra.
+    @Column(columnDefinition = "nvarchar(MAX)") // Cho phép lưu văn bản dài và có dấu
+    String description;
+
+    // Trong file Product.java
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImage> productImages = new ArrayList<>();
+
+    // Helper method để thêm ảnh dễ dàng hơn
+    public void addProductImage(ProductImage image) {
+        productImages.add(image);
+        image.setProduct(this);
+    }
 }

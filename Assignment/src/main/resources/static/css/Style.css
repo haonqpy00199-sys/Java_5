@@ -1,0 +1,35 @@
+/* Bong bóng chat */
+#chat-bubble {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #00a8e8, #0077b6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    z-index: 9999;
+    transition: 0.3s;
+}
+
+/* Cửa sổ chat */
+#chat-window {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 320px;
+    display: none; /* Ẩn mặc định */
+    background: white;
+    z-index: 10000;
+}
+
+.chat-header { background: #00a8e8; }
+
+#chat-body::-webkit-scrollbar { width: 5px; }
+#chat-body::-webkit-scrollbar-thumb { background: #eee; border-radius: 10px; }
+
+.cursor-pointer { cursor: pointer; }

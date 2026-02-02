@@ -71,4 +71,12 @@ public class MailController {
 
         return "mail/form";
     }
+
+    @GetMapping("/mail/history")
+    public String history(Model model) {
+        model.addAttribute("mails", mailService.getSentMails());
+        return "mail/history";
+    }
+
+
 }

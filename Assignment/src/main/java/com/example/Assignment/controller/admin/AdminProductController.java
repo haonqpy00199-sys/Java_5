@@ -1,7 +1,9 @@
 package com.example.Assignment.controller.admin;
 
 import com.example.Assignment.entity.Product;
+import com.example.Assignment.entity.ProductImage; // Entity cho bảng ảnh phụ
 import com.example.Assignment.repository.CategoryRepository;
+import com.example.Assignment.repository.ProductImageRepository; // Repository cho bảng ảnh phụ
 import com.example.Assignment.repository.ProductRepository;
 import com.example.Assignment.service.UploadService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -19,6 +22,7 @@ import java.util.Date;
 public class AdminProductController {
     @Autowired ProductRepository pRepo;
     @Autowired CategoryRepository cRepo;
+    @Autowired ProductImageRepository piRepo; // Inject repository quản lý ảnh phụ
     @Autowired UploadService uploadService;
 
     @InitBinder
@@ -45,7 +49,8 @@ public class AdminProductController {
 
     @GetMapping("/edit/{id}")
     public String edit(Model model, @PathVariable("id") Integer id) {
-        model.addAttribute("product", pRepo.findById(id).get());
+        // Dùng orElse(null) an toàn hơn .get()
+        model.addAttribute("product", pRepo.findById(id).orElse(null));
         model.addAttribute("categories", cRepo.findAll());
         model.addAttribute("view", "admin/product/form");
         return "layout/index";
@@ -53,19 +58,40 @@ public class AdminProductController {
 
     @PostMapping("/save")
     public String save(@ModelAttribute("product") Product product,
-                       @RequestParam("imageFile") MultipartFile imageFile) {
-        if (!imageFile.isEmpty()) {
-            // Nếu có ảnh mới, lưu file vật lý và gán tên mới cho product
+                       @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+                       @RequestParam(value = "moreFiles", required = false) MultipartFile[] moreFiles) {
+
+        // 1. Xử lý ảnh đại diện chính (imageFile)
+        if (imageFile != null && !imageFile.isEmpty()) {
             String fileName = uploadService.save(imageFile);
             product.setImage(fileName);
         } else if (product.getId() != null) {
-            // Nếu không có ảnh mới và là cập nhật, lấy lại tên ảnh cũ từ DB
+            // Nếu không chọn ảnh mới, lấy lại tên ảnh cũ từ DB để không bị null
             pRepo.findById(product.getId()).ifPresent(old -> product.setImage(old.getImage()));
         }
 
-        if (product.getId() == null) product.setCreateDate(new Date());
+        // 2. Thiết lập ngày tạo
+        if (product.getId() == null) {
+            product.setCreateDate(new Date());
+        }
 
-        pRepo.save(product);
+        // 3. Lưu sản phẩm trước để có ID (quan trọng để liên kết ảnh phụ)
+        Product savedProduct = pRepo.save(product);
+
+        // 4. Xử lý danh sách ảnh phụ (moreFiles)
+        if (moreFiles != null && moreFiles.length > 0) {
+            for (MultipartFile file : moreFiles) {
+                if (!file.isEmpty()) {
+                    String fileName = uploadService.save(file);
+
+                    ProductImage pi = new ProductImage();
+                    pi.setImageName(fileName);
+                    pi.setProduct(savedProduct); // Liên kết với sản phẩm vừa lưu
+                    piRepo.save(pi);
+                }
+            }
+        }
+
         return "redirect:/admin/product/index?message=Success!";
     }
 

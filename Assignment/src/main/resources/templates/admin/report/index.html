@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
 </head>
 <body>
 <div class="row g-4 mb-4">
@@ -12,7 +11,7 @@
                 <h6 class="mb-0 fw-bold">Revenue Distribution</h6>
             </div>
             <div class="card-body d-flex align-items-center justify-content-center">
-                <div style="width: 100%; max-width: 300px;">
+                <div style="width: 100%; max-width: 300px; min-height: 300px;">
                     <canvas id="revenueChart"></canvas>
                 </div>
             </div>
@@ -26,11 +25,12 @@
             <ul class="list-group list-group-flush small">
                 <li class="list-group-item d-flex justify-content-between px-0">
                     <span>Top Category:</span>
-                    <span class="fw-bold text-info" th:text="${items[0][0]}"></span>
+                    <span class="fw-bold text-info"
+                          th:text="${items != null and !items.isEmpty() ? items[0][0] : 'N/A'}"></span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between px-0">
                     <span>Active Categories:</span>
-                    <span class="fw-bold" th:text="${#lists.size(items)}"></span>
+                    <span class="fw-bold" th:text="${items != null ? #lists.size(items) : 0}"></span>
                 </li>
             </ul>
         </div>
@@ -39,29 +39,48 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script th:inline="javascript">
-    const labels = [[${labels}]];
-    const dataValues = [[${values}]];
+    // Sử dụng try-catch để nếu biểu đồ lỗi, Header vẫn không bị "đơ"
+    try {
+        // Gán giá trị mặc định là mảng rỗng nếu dữ liệu từ server bị null
+        const labels = [[${labels}]] || [];
+        const dataValues = [[${values}]] || [];
 
-    const ctx = document.getElementById('revenueChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: labels,
-            datasets: [{
-                data: dataValues,
-                backgroundColor: [
-                    '#00a8e8', '#ff6384', '#ffcd56', '#4bc0c0', '#9966ff', '#ff9f40'
-                ],
-                borderWidth: 2,
-                borderColor: '#ffffff'
-            }]
-        },
-        options: {
-            plugins: {
-                legend: { position: 'bottom', labels: { usePointStyle: true, font: { size: 11 } } }
+        if (labels.length > 0) {
+            const canvas = document.getElementById('revenueChart');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: dataValues,
+                            backgroundColor: [
+                                '#00a8e8', '#ff6384', '#ffcd56', '#4bc0c0', '#9966ff', '#ff9f40'
+                            ],
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { usePointStyle: true, font: { size: 11 } }
+                            }
+                        }
+                    }
+                });
             }
+        } else {
+            console.warn("SkyShop Alert: No data available for revenue chart.");
         }
-    });
+    } catch (e) {
+        // Log lỗi ra console thay vì làm treo cả Header
+        console.error("Critical Chart Error: ", e);
+    }
 </script>
 </body>
 </html>

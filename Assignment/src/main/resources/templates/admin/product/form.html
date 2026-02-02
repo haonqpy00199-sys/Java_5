@@ -6,66 +6,93 @@
 </head>
 <body>
 <div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card shadow-sm border-0 rounded-3">
-            <div class="card-header bg-white py-3 border-bottom-0">
-                <h5 class="mb-0 fw-bold text-dark">
-                    <i class="fa-solid fa-pen-nib me-2 text-info"></i>
+    <div class="col-lg-10">
+        <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+            <div class="card-header bg-dark py-3 border-bottom-0">
+                <h5 class="mb-0 fw-bold text-white">
+                    <i class="fa-solid fa-pen-to-square me-2 text-info"></i>
                     <span th:text="${product.id == null ? 'Create New Product' : 'Edit Product (ID: ' + product.id + ')'}"></span>
                 </h5>
             </div>
 
-            <div class="card-body p-4">
+            <div class="card-body p-4 bg-white text-dark">
                 <form th:action="@{/admin/product/save}" method="post" th:object="${product}" enctype="multipart/form-data">
-
                     <input type="hidden" th:field="*{id}">
                     <input type="hidden" th:field="*{image}">
-                    <div class="row mb-3">
-                        <div class="col-md-6 mb-3 mb-md-0">
-                            <label class="form-label fw-bold small text-muted">Product Name</label>
-                            <input type="text" th:field="*{name}" class="form-control shadow-none border-secondary-subtle"
-                                   placeholder="Enter product name" required>
+
+                    <div class="row mb-4">
+                        <div class="col-md-7">
+                            <label class="form-label fw-bold small text-muted text-uppercase">Product Name</label>
+                            <input type="text" th:field="*{name}" class="form-control form-control-lg shadow-none border-secondary-subtle"
+                                   placeholder="e.g., iPhone 15 Pro Max" required>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold small text-muted">Category</label>
-                            <select th:field="*{category.id}" class="form-select shadow-none border-secondary-subtle">
+                        <div class="col-md-5">
+                            <label class="form-label fw-bold small text-muted text-uppercase">Category</label>
+                            <select th:field="*{category.id}" class="form-select form-select-lg shadow-none border-secondary-subtle">
                                 <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}"></option>
                             </select>
                         </div>
                     </div>
 
-                    <div class="row mb-4 align-items-center">
-                        <div class="col-md-6 mb-3 mb-md-0">
-                            <label class="form-label fw-bold small text-muted">Price (₫)</label>
-                            <input type="number" step="1000" th:field="*{price}" class="form-control shadow-none border-secondary-subtle"
-                                   placeholder="0.00" required>
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-muted text-uppercase">Price (₫)</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-light border-secondary-subtle">₫</span>
+                                <input type="number" step="1000" th:field="*{price}" class="form-control shadow-none border-secondary-subtle" required>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold small d-block mb-2 text-muted">Inventory Status</label>
-                            <div class="form-check form-switch">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-muted text-uppercase">Inventory Status</label>
+                            <div class="form-check form-switch pt-2">
                                 <input class="form-check-input shadow-none" type="checkbox" th:field="*{available}" id="availableSwitch">
-                                <label class="form-check-label small" for="availableSwitch">Available for sale</label>
+                                <label class="form-check-label ms-2 fw-bold text-success" for="availableSwitch">Available for sale</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4 opacity-25">
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label fw-bold text-dark"><i class="fa-solid fa-image me-2 text-info"></i>Primary Image</label>
+                            <div class="p-3 border rounded-3 bg-light">
+                                <div th:if="${product.image != null}" class="mb-3 text-center">
+                                    <img th:src="@{|/images/${product.image}|}" height="120" class="rounded shadow-sm border border-white" alt="Main">
+                                    <p class="small text-muted mt-2 mb-0">Current Main Photo</p>
+                                </div>
+                                <input type="file" name="imageFile" class="form-control shadow-none border-info-subtle" accept="image/*">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label fw-bold text-dark"><i class="fa-solid fa-images me-2 text-primary"></i>Product Gallery</label>
+                            <div class="p-3 border rounded-3 bg-light">
+                                <div th:if="${product.productImages != null and !product.productImages.isEmpty()}" class="d-flex gap-2 flex-wrap mb-3">
+                                    <div th:each="img : ${product.productImages}" class="position-relative shadow-sm rounded border bg-white p-1">
+                                        <img th:src="@{|/images/${img.imageName}|}" height="50" class="rounded" alt="Gallery">
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-white" style="cursor:pointer">
+                                            <i class="fa-solid fa-xmark" style="font-size: 8px;"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <input type="file" name="moreFiles" class="form-control shadow-none border-primary-subtle" accept="image/*" multiple>
+                                <small class="text-info d-block mt-2"><i class="fa-solid fa-circle-info me-1"></i>Select multiple files for descriptive gallery.</small>
                             </div>
                         </div>
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label fw-bold small text-muted">Product Image</label>
-
-                        <div th:if="${product.image != null}" class="mb-3 p-2 border rounded-3 bg-light d-inline-block shadow-sm">
-                            <img th:src="@{|/images/${product.image}|}" height="120" class="rounded" alt="Current image">
-                            <small class="d-block text-center text-muted mt-1 fw-bold">Current Preview</small>
-                        </div>
-
-                        <input type="file" name="imageFile" class="form-control shadow-none border-secondary-subtle" accept="image/*">
-                        <div class="form-text small text-info"><i class="fa-solid fa-circle-info me-1"></i>Leave empty to keep current image.</div>
+                        <label class="form-label fw-bold text-dark text-uppercase small">Product Description</label>
+                        <textarea th:field="*{description}" class="form-control shadow-none border-secondary-subtle bg-light"
+                                  rows="6" placeholder="Describe your product's best features here..."></textarea>
                     </div>
 
-                    <div class="d-flex justify-content-end border-top pt-4">
-                        <a th:href="@{/admin/product/index}" class="btn btn-light border rounded-pill me-3 px-4 fw-bold">
+                    <div class="d-flex justify-content-end gap-2 border-top pt-4">
+                        <a th:href="@{/admin/product/index}" class="btn btn-outline-secondary rounded-pill px-4 fw-bold shadow-sm">
                             Cancel
                         </a>
-                        <button type="submit" class="btn btn-info text-white rounded-pill px-5 fw-bold shadow-sm" style="background-color: #00a8e8;">
+                        <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm" style="background-color: #00a8e8; border: none;">
                             <i class="fa-solid fa-cloud-arrow-up me-2"></i>Save Product
                         </button>
                     </div>

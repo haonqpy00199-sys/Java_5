@@ -4,6 +4,7 @@ import com.example.Assignment.entity.Product;
 import com.example.Assignment.repository.ProductRepository;
 import com.example.Assignment.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.SessionScope;
 
@@ -11,70 +12,74 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-@SessionScope // Giỏ hàng duy nhất cho mỗi phiên làm việc của người dùng
+/**
+ * CartServiceImpl: Xử lý logic giỏ hàng lưu trữ trong Session
+ * proxyMode là bắt buộc để Thymeleaf có thể gọi đến các phương thức như getCount()
+ */
 @Service
+@SessionScope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class CartServiceImpl implements CartService {
     @Autowired
     ProductRepository pRepo;
 
-    // Map dùng để lưu trữ sản phẩm trong giỏ (Key: ID sản phẩm, Value: Đối tượng Product)
+    // Sử dụng Map để quản lý sản phẩm (Key là ID sản phẩm)
     Map<Integer, Product> map = new HashMap<>();
 
     @Override
     public void add(Integer id) {
         Product p = map.get(id);
         if (p == null) {
-            // Nếu chưa có trong giỏ, lấy từ DB và đặt số lượng là 1 [cite: 26]
-            p = pRepo.findById(id).get();
-            p.setQty(1);
-            map.put(id, p);
+            // ĐÃ SỬA: Dùng orElse(null) và kiểm tra null để tránh lỗi No value present
+            Product productFromDb = pRepo.findById(id).orElse(null);
+            if (productFromDb != null) {
+                productFromDb.setQty(1); // Đảm bảo entity Product có trường @Transient Integer qty
+                map.put(id, productFromDb);
+            }
         } else {
-            // Nếu đã có, tăng số lượng lên 1
             p.setQty(p.getQty() + 1);
         }
     }
 
     @Override
     public void remove(Integer id) {
-        // Xóa mặt hàng khỏi giỏ [cite: 29]
         map.remove(id);
     }
 
     @Override
     public void update(Integer id, int qty) {
-        // Cập nhật số lượng mới cho mặt hàng
         Product p = map.get(id);
         if (p != null) {
-            p.setQty(qty);
-            if (p.getQty() <= 0) {
-                map.remove(id);
+            if (qty > 0) {
+                p.setQty(qty);
+            } else {
+                map.remove(id); // Nếu số lượng <= 0 thì xóa khỏi giỏ
             }
         }
     }
 
     @Override
     public void clear() {
-        // Xóa sạch toàn bộ giỏ hàng
         map.clear();
     }
 
     @Override
     public Collection<Product> getItems() {
-        // Trả về danh sách các mặt hàng để hiển thị [cite: 27]
         return map.values();
     }
 
     @Override
     public int getCount() {
-        // Tổng số lượng tất cả các món đồ trong giỏ
+        // Tính tổng số lượng tất cả sản phẩm
         return map.values().stream()
-                .mapToInt(p -> p.getQty()).sum();
+                .mapToInt(p -> p.getQty())
+                .sum();
     }
 
     @Override
     public double getAmount() {
-        // Tổng thành tiền (Giá x Số lượng)
+        // Tính tổng tiền giỏ hàng
         return map.values().stream()
-                .mapToDouble(p -> p.getPrice() * p.getQty()).sum();
+                .mapToDouble(p -> p.getPrice() * p.getQty())
+                .sum();
     }
 }

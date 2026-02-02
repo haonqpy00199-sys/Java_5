@@ -1,33 +1,125 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meưta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="UTF-8">
+    <title>SkyShop - Product Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        .thumb-item {
+            width: 70px; height: 70px;
+            border: 2px solid #eee; border-radius: 6px;
+            cursor: pointer; object-fit: cover; transition: 0.2s;
+            flex-shrink: 0;
+        }
+        .thumb-item.active { border-color: #ffa41c; box-shadow: 0 0 5px rgba(255, 164, 28, 0.3); }
+        .upload-placeholder {
+            width: 70px; height: 70px;
+            border: 2px dashed #ccc; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #888; flex-shrink: 0;
+        }
+        /* Giúp danh sách ảnh không bị tràn khung */
+        .gallery-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
+    </style>
 </head>
 <body>
-<div class="row bg-white p-4 shadow-sm rounded">
-    <div class="col-md-5 text-center border-end">
-        <img th:src="@{|/images/${item.image}|}" class="img-fluid" style="max-height: 400px;">
-    </div>
 
-    <div class="col-md-7 ps-4">
-        <h2 class="fw-normal" th:text="${item.name}"></h2>
-        <div class="text-info small mb-2">Visit the Store</div>
-        <div class="text-warning mb-3">
-            4.5 <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>...
+<div class="container mt-4">
+    <div class="row bg-white p-4 shadow-sm rounded border-0" th:if="${item != null}">
+
+        <div class="col-md-5 text-center border-end">
+            <div class="d-flex align-items-center justify-content-center p-3 mb-3 border rounded bg-light" style="min-height: 400px;">
+                <img id="main-img" th:src="@{|/images/${item.image}|}" class="img-fluid"
+                     style="max-height: 380px; object-fit: contain;" alt="Product Image">
+            </div>
+
+            <div class="gallery-scroll px-2" id="gallery-container">
+                <img th:src="@{|/images/${item.image}|}" class="thumb-item active" onclick="changePreview(this)">
+
+                <th:block th:if="${item.productImages != null}">
+                    <img th:each="img : ${item.productImages}"
+                         th:src="@{|/images/${img.imageName}|}"
+                         class="thumb-item"
+                         onclick="changePreview(this)">
+                </th:block>
+
+                <label class="upload-placeholder" for="file-upload">
+                    <i class="fa-solid fa-plus"></i>
+                    <input type="file" id="file-upload" multiple hidden accept="image/*" onchange="previewLocalFiles(event)">
+                </label>
+            </div>
         </div>
-        <hr>
-        <div class="text-danger h3" th:text="${#numbers.formatCurrency(item.price)}"></div>
-        <p class="mt-3"><b>About this item:</b> High quality product from Amazon Selection.</p>
 
-        <div class="card bg-light mt-4" style="max-width: 300px;">
-            <div class="card-body">
-                <div class="text-success fw-bold">In Stock</div>
-                <a th:href="@{|/cart/add/${item.id}|}" class="btn btn-warning w-100 rounded-pill fw-bold mt-3">Add to Cart</a>
-                <button class="btn btn-orange w-100 rounded-pill fw-bold mt-2 text-white" style="background-color: #ffa41c;">Buy Now</button>
+        <div class="col-md-7 ps-md-5">
+            <h2 class="fw-bold text-dark mb-1" th:text="${item.name}">Product Name</h2>
+            <div class="text-info small mb-2" style="cursor: pointer;">Visit the SkyShop Store</div>
+
+            <div class="d-flex align-items-center mb-3">
+                <span class="text-warning me-2" style="font-size: 0.9rem;">
+                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>
+                </span>
+                <span class="text-info small fw-bold">4.5 ratings</span>
+            </div>
+
+            <hr class="my-3">
+
+            <div class="mb-3">
+                <span class="text-danger h2 fw-bold" th:text="${#numbers.formatCurrency(item.price)}"></span>
+            </div>
+
+            <div class="mt-4">
+                <h6 class="fw-bold text-dark mb-2">About this item:</h6>
+                <div class="text-muted small lh-lg">
+                    <span th:utext="${item.description != null ? item.description : 'Welcome to SkyShop!'}"></span>
+                </div>
+            </div>
+
+            <div class="card border-info-subtle mt-4 shadow-sm" style="max-width: 320px; border-radius: 12px; background-color: #f8fafc;">
+                <div class="card-body p-4">
+                    <a th:href="@{|/cart/add/${item.id}|}"
+                       class="btn btn-warning w-100 rounded-pill fw-bold py-2 shadow-sm border-0 mb-2">
+                        Add to Cart
+                    </a>
+                    <button class="btn w-100 rounded-pill fw-bold text-white py-2 shadow-sm"
+                            style="background-color: #ffa41c; border: none;">
+                        Buy Now
+                    </button>
+                    <div class="mt-3 small text-muted text-center">
+                        <i class="fa-solid fa-lock me-1"></i> Secure transaction
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    function changePreview(el) {
+        document.getElementById('main-img').src = el.src;
+        document.querySelectorAll('.thumb-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    function previewLocalFiles(event) {
+        const files = event.target.files;
+        const container = document.getElementById('gallery-container');
+        const btn = event.target.parentElement;
+
+        Array.from(files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'thumb-item';
+                img.onclick = function() { changePreview(this); };
+                container.insertBefore(img, btn);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+</script>
+
 </body>
 </html>

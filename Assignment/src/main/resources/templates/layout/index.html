@@ -2,28 +2,112 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>SkyShop - Your Online Store</title>
+    <title>SkyShop - Seasonal Magic</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
     <style>
-        body { background-color: #f3f3f3; font-family: 'Roboto', sans-serif; }
-        footer { background-color: #0f172a !important; }
+        /* --- CSS HIỆU ỨNG NỀN & THEME (GIỮ NGUYÊN) --- */
+        body {
+            margin: 0; min-height: 100vh; display: flex; flex-direction: column;
+            background-size: cover; background-attachment: fixed; background-position: center;
+            transition: background 1.2s ease-in-out, color 0.3s ease;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            color: #1e293b !important;
+        }
+        body.theme-light { background-image: url('https://img.freepik.com/free-vector/white-abstract-background_23-2148810113.jpg'); }
+        body.theme-spring { background-image: url('https://images.pexels.com/photos/1083822/pexels-photo-1083822.jpeg?auto=compress&cs=tinysrgb&w=1920'); }
+        body.theme-summer { background-image: url('https://images.pexels.com/photos/457882/pexels-photo-457882.jpeg?auto=compress&cs=tinysrgb&w=1920'); }
+        body.theme-autumn { background-image: url('https://images.pexels.com/photos/33109/fall-autumn-red-season.jpg?auto=compress&cs=tinysrgb&w=1920'); }
+        body.theme-christmas { background-image: url('https://images.pexels.com/photos/1303082/pexels-photo-1303082.jpeg?auto=compress&cs=tinysrgb&w=1920'); }
+        body.theme-dark { background-image: url('https://images.pexels.com/photos/2832382/pexels-photo-2832382.jpeg?auto=compress&cs=tinysrgb&w=1920'); color: #f8fafc !important; }
+
+        /* Lớp vẽ hạt phủ toàn màn hình */
+        #seasonal-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        header { position: relative; z-index: 2000; }
+        main.container-fluid { position: relative; z-index: 10; margin-top: 130px !important; flex: 1 0 auto; }
+        footer { position: relative; z-index: 10; background-color: #0f172a !important; }
     </style>
 </head>
-<body>
+<body class="d-flex flex-column theme-light">
+
+<canvas id="seasonal-canvas"></canvas>
+
 <header th:replace="~{layout/_header :: header}"></header>
 
-<main class="container-fluid mt-4">
+<main class="container-fluid px-lg-5">
     <div th:replace="~{ ${view} }"></div>
 </main>
 
-<footer class="mt-5 p-4 text-white text-center">
-    <div class="mb-2">
-        <i class="fa-solid fa-cloud-bolt me-2"></i><b>SkyShop</b>
-    </div>
-    <p class="small text-muted">&copy; 2026 SkyShop Project - Java 5 Assignment</p>
+<footer class="p-4 text-white text-center mt-auto">
+    <div class="mb-2"><i class="fa-solid fa-cloud-bolt text-info me-2"></i><b class="fs-5">SkyShop</b></div>
+    <p class="small text-muted mb-0">&copy; 2026 Premium Experience - Java 5 Assignment</p>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    /* --- TOÀN BỘ ĐỘNG CƠ VẬT LÝ 4 MÙA --- */
+    const canvas = document.getElementById('seasonal-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize);
+    resize();
+
+    class Particle {
+        constructor(type) { this.type = type; this.reset(); }
+        reset() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height - canvas.height;
+            this.size = (this.type === 'theme-christmas') ? Math.random() * 3 + 1 : Math.random() * 4 + 2;
+            this.speed = Math.random() * 1.2 + 0.5;
+            this.wind = Math.random() * 0.8 - 0.4;
+            this.angle = Math.random() * Math.PI * 2;
+            this.spin = Math.random() * 0.05 - 0.025;
+        }
+        update() {
+            this.y += this.speed; this.x += this.wind; this.angle += this.spin;
+            if (this.type === 'theme-summer') this.x += 1.2;
+            if (this.y > canvas.height || this.x > canvas.width || this.x < 0) this.reset();
+        }
+        draw() {
+            ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.angle); ctx.beginPath();
+            if (this.type === 'theme-christmas') { ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'; ctx.arc(0, 0, this.size, 0, Math.PI * 2); ctx.fill(); }
+            else if (this.type === 'theme-spring') { ctx.fillStyle = '#ffb7c5'; ctx.ellipse(0, 0, this.size, this.size / 1.5, 0, 0, Math.PI * 2); ctx.fill(); }
+            else if (this.type === 'theme-autumn') { ctx.fillStyle = '#e67e22'; ctx.moveTo(0, -this.size); ctx.quadraticCurveTo(this.size, 0, 0, this.size); ctx.quadraticCurveTo(-this.size, 0, 0, -this.size); ctx.fill(); }
+            else if (this.type === 'theme-summer') { ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)'; ctx.lineWidth = 1; ctx.moveTo(-15, 0); ctx.lineTo(15, 0); ctx.stroke(); }
+            ctx.restore();
+        }
+    }
+
+    function initParticles(theme) {
+        particles = [];
+        const count = 75;
+        for (let i = 0; i < count; i++) { particles.push(new Particle(theme)); }
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => { p.update(); p.draw(); });
+        requestAnimationFrame(animate);
+    }
+
+    function changeTheme(themeName) {
+        document.body.className = 'd-flex flex-column ' + themeName;
+        localStorage.setItem('skyshop-theme', themeName);
+        initParticles(themeName);
+    }
+
+    window.onload = function() {
+        const savedTheme = localStorage.getItem('skyshop-theme') || 'theme-light';
+        changeTheme(savedTheme);
+        animate();
+    };
+</script>
 </body>
 </html>

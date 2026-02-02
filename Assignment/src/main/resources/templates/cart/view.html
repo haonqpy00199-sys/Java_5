@@ -1,81 +1,71 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>View</title>
+    <title>Shopping Cart - SkyShop</title>
 </head>
 <body>
-<div class="row mt-4">
-    <div class="col-md-9 border-end bg-white p-4 shadow-sm rounded-start">
-        <h2 class="fw-normal border-bottom pb-3">Shopping Cart</h2>
+<div class="container mt-5 pt-5">
+    <div class="row">
+        <div class="col-md-9 bg-white p-4 shadow-sm rounded-3 border">
+            <h2 class="fw-bold border-bottom pb-3 mb-4">Shopping Cart</h2>
 
-        <div th:if="${cart.count == 0}" class="text-center py-5">
-            <h4 class="text-muted">Your Amazon Cart is empty.</h4>
-            <p>Check your Saved items or continue shopping.</p>
-            <a th:href="@{/home/index}" class="btn btn-warning rounded-pill px-4 fw-bold">Shop now</a>
-        </div>
+            <div th:if="${cart.count == 0}" class="text-center py-5">
+                <img src="https://m.media-amazon.com/images/G/01/cart/empty/kettle-desaturated._CB445243794_.svg"
+                     style="width: 200px;" class="mb-4 opacity-50">
+                <h4 class="text-dark fw-bold">Your SkyShop Cart is empty.</h4>
+                <p class="text-muted">Check your deals or continue shopping.</p>
+                <a th:href="@{/home/index}" class="btn btn-warning rounded-pill px-5 fw-bold mt-2"
+                   style="background-color: #ffd814; border: 1px solid #fcd200;">Shop now</a>
+            </div>
 
-        <div th:if="${cart.count > 0}">
-            <div th:each="p : ${cart.items}" class="row py-3 border-bottom align-items-center">
-                <div class="col-md-3 text-center">
-                    <img th:src="@{|/images/${p.image}|}" class="img-fluid" style="max-height: 150px; object-fit: contain;">
-                </div>
-                <div class="col-md-6">
-                    <h5 class="mb-1" th:text="${p.name}"></h5>
-                    <p class="text-success small mb-1">In Stock</p>
-                    <p class="text-muted small mb-2">Eligible for FREE Shipping</p>
+            <div th:if="${cart.count > 0}">
+                <div th:each="p : ${cart.items}" class="row py-3 border-bottom align-items-center">
+                    <div class="col-md-2 text-center">
+                        <img th:src="@{|/images/${p.image}|}" class="img-fluid rounded" style="max-height: 100px;">
+                    </div>
+                    <div class="col-md-7">
+                        <h5 class="mb-1 fw-bold text-dark" th:text="${p.name}"></h5>
+                        <p class="text-success small mb-1"><i class="fa-solid fa-check"></i> In Stock</p>
 
-                    <div class="d-flex align-items-center">
-                        <form th:action="@{|/cart/update/${p.id}|}" method="post" class="d-flex align-items-center">
-                            <label class="me-2 small">Qty:</label>
-                            <input type="number" name="qty" th:value="${p.qty}"
-                                   onchange="this.form.submit()" class="form-control form-control-sm w-50" min="1">
-                        </form>
-                        <span class="mx-2 text-muted">|</span>
-                        <a th:href="@{|/cart/remove/${p.id}|}" class="text-decoration-none small text-primary">Delete</a>
+                        <div class="d-flex align-items-center mt-2">
+                            <form th:action="@{|/cart/update/${p.id}|}" method="post" class="d-flex align-items-center">
+                                <label class="me-2 small">Qty:</label>
+                                <select name="qty" onchange="this.form.submit()" class="form-select form-select-sm shadow-none" style="width: 65px;">
+                                    <option th:each="i : ${#numbers.sequence(1, 10)}" th:value="${i}" th:text="${i}" th:selected="${i == p.qty}"></option>
+                                </select>
+                            </form>
+                            <span class="mx-3 text-secondary opacity-25">|</span>
+                            <a th:href="@{|/cart/remove/${p.id}|}" class="text-decoration-none small text-primary">Delete</a>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-end">
+                        <p class="h5 fw-bold text-dark" th:text="${#numbers.formatCurrency(p.price)}"></p>
                     </div>
                 </div>
-                <div class="col-md-3 text-end">
-                    <p class="h5 fw-bold" th:text="${#numbers.formatCurrency(p.price)}"></p>
-                </div>
-            </div>
-
-            <div class="text-end mt-3">
-                <a th:href="@{/cart/clear}" class="text-danger small text-decoration-none">
-                    <i class="fa-solid fa-trash-can"></i> Clear all items
-                </a>
             </div>
         </div>
-    </div>
 
-    <div class="col-md-3 bg-light p-4 shadow-sm rounded-end h-100">
-        <div class="sticky-top" style="top: 20px;">
-            <div class="mb-3">
-                <span class="text-success small"><i class="fa-solid fa-circle-check"></i> Your order qualifies for FREE Shipping.</span>
-            </div>
-
-            <h5 class="mb-4">
-                Subtotal (<span th:text="${cart.count}"></span> items):
-                <span class="text-danger fw-bold d-block mt-2" th:text="${#numbers.formatCurrency(cart.amount)}"></span>
-            </h5>
-
-            <div class="form-check mb-4 small">
-                <input class="form-check-input" type="checkbox" id="giftCheck">
-                <label class="form-check-label" for="giftCheck">This order contains a gift</label>
-            </div>
-
-            <a th:href="@{/order/checkout}"
-               th:classappend="${cart.count == 0} ? 'disabled btn-secondary' : 'btn-warning'"
-               class="btn w-100 rounded-pill fw-bold shadow-sm py-2 mb-3">
-                Proceed to Checkout
-            </a>
-
-            <div class="card border-0 bg-transparent mt-4">
-                <div class="card-body p-0 small">
-                    <p class="fw-bold mb-1">Your recently viewed items</p>
-                    <hr class="my-2">
-                    <p class="text-muted">Return to the homepage to see more products.</p>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 rounded-3 p-4 sticky-top" style="top: 90px; background-color: #f8f9fa;">
+                <div class="mb-3">
+                        <span class="text-success small d-flex">
+                            <i class="fa-solid fa-circle-check mt-1 me-2"></i>
+                            <span>Your order qualifies for <strong>FREE Shipping</strong>.</span>
+                        </span>
                 </div>
+
+                <h5 class="mb-4">
+                    Subtotal (<span th:text="${cart.count}"></span> items):
+                    <span class="text-danger fw-bold d-block mt-2 fs-4" th:text="${#numbers.formatCurrency(cart.amount)}"></span>
+                </h5>
+
+                <a th:href="@{/order/checkout}"
+                   th:classappend="${cart.count == 0} ? 'disabled btn-secondary' : ''"
+                   class="btn btn-warning w-100 rounded-pill fw-bold py-2 mb-3 shadow-sm border-1"
+                   style="background-color: #ffd814; border-color: #fcd200; color: #111;">
+                    Proceed to Checkout
+                </a>
             </div>
         </div>
     </div>
